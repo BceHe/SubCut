@@ -31,4 +31,4 @@
 | **OCR Engine** | Google ML Kit On-Device Vision API |
 | **Target Platform** | Android & iOS |
 
-### System Data Flow
+
