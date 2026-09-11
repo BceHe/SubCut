@@ -25,7 +25,7 @@
 
 | Layer | Technology / Tool |
 | :--- | :--- |
-| **Framework** | Flutter / React Native |
+| **Framework** | Flutter / Android Studio |
 | **Language** | Dart / TypeScript |
 | **Local Storage** | SQLite / WatermelonDB (Mengutamakan privasi data finansial di perangkat) |
 | **OCR Engine** | Google ML Kit On-Device Vision API |
