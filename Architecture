@@ -1,0 +1,127 @@
+# System Architecture Specification: SubCut (Flutter App)
+
+## 1. System Overview
+SubCut adalah aplikasi mobile Flutter berarsitektur *local-first* (privacy-focused) yang memantau dan mengelola tagihan berulang (*subscriptions*) serta *free trials*. 
+
+Aplikasi bekerja tanpa *backend server* terpusat. Pengolahan data (parsing notifikasi, scan OCR, dan jadwal pengingat) dilakukan secara *on-device* menggunakan database lokal.
+
+---
+
+[ Presentation Layer (UI/UX Mobile App) ]
+                   │
+                   ▼
+[ Local Processing & Service Layer ]
+  ├── Notification Listener Service (Mendeteksi SMS/Push Notif Bank/E-Wallet)
+  ├── Local OCR Engine (On-Device Receipt Scanner)
+  └── Subscription Parser & Rule Engine (Ekstraksi Nominal & Tanggal)
+                   │
+                   ▼
+[ Data Storage Layer ]
+  ├── Local Encrypted Database (SQLite / Hive / Room)
+  └── Optional Cloud Sync (Supabase/Firebase - Tanpa Data Perbankan)
+
+
+directory:
+  subcut/
+├── android/                        # Konfigurasi platform Android (Permission Notification Listener)
+├── ios/                            # Konfigurasi platform iOS
+├── lib/
+│   ├── core/                       # Komponen global, utilitas, dan basis data
+│   │   ├── constants/              # Regex rules (pola deteksi teks bank/e-wallet), warna, & string
+│   │   ├── database/               # Inisialisasi SQLite / Hive lokal & enkripsi SQLCipher
+│   │   ├── services/               # Layanan background, Local Notifications, & ML Kit OCR
+│   │   └── utils/                  # Format mata uang IDR & kalkulator tanggal jatuh tempo
+│   │
+│   ├── features/                   # Pembagian kode modular berdasarkan fitur inti
+│   │   ├── dashboard/              # Fitur 1: Ringkasan Pengeluaran & Burn Rate
+│   │   │   ├── data/               # Model data ringkasan & lokal repository
+│   │   │   ├── domain/             # Business logic (kalkulasi total bulanan/tahunan)
+│   │   │   └── presentation/       # UI Dashboard, kartu langganan terdekat, & chart
+│   │   │
+│   │   ├── subscriptions/          # Fitur 2: CRUD Manual & Detail Langganan
+│   │   │   ├── data/               # Model entitas langganan & database helper
+│   │   │   ├── domain/             # Validasi data langganan
+│   │   │   └── presentation/       # Halaman form tambah/edit, detail, & tombol 1-Tap Shortcut
+│   │   │
+│   │   ├── automation/             # Fitur 3 & 5: Notification Listener & OCR Scanner
+│   │   │   ├── data/               # Ekstraktor teks notifikasi & integrasi Google ML Kit
+│   │   │   ├── domain/             # Parser rule engine (mencocokkan merchant & nominal)
+│   │   │   └── presentation/       # UI draf konfirmasi hasil scan OCR / notifikasi masuk
+│   │   │
+│   │   └── settings/               # Pengaturan Aplikasi & Manajemen Notifikasi Lokal
+│   │       ├── data/               # Pengaturan preferensi lokal (SharedPreferences)
+│   │       └── presentation/       # UI halaman pengaturan pengingat H-3 / H-1
+│   │
+│   ├── app.dart                    # Konfigurasi tema global & routes aplikasi
+│   └── main.dart                   # Titik masuk utama (Inisialisasi Local DB & Background Service)
+│
+├── test/                           # Unit testing & widget testing (Akurasi parser & database)
+├── pubspec.yaml                    # Daftar dependencies (flutter_local_notifications, google_mlkit_text_recognition, sqflite/hive)
+└── README.md                       # Dokumentasi instalasi dan pengujian proyek
+
+## 2. High-Level Architecture Diagram
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                     INPUT SOURCES (Local)                       │
+├────────────────────────────────┬────────────────────────────────┤
+│  Android Notification Listener │   Google ML Kit (OCR Engine)   │
+│  (Intersects Bank/E-Wallet)    │   (Scans Image/Receipt)        │
+└───────────────┬────────────────┴────────────────┬───────────────┘
+                │                                 │
+                ▼                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATA PROCESSING LAYER                       │
+├─────────────────────────────────────────────────────────────────┤
+│  - Regex Parsing Engine (Extracts Merchant Name & Amount)       │
+│  - Categorization & Cycle Detector (Monthly/Yearly)            │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     STATE MANAGEMENT & STORAGE                  │
+├─────────────────────────────────────────────────────────────────┤
+│  - State Management: Provider / Riverpod / Bloc                 │
+│  - Database: SQLite (sqflite) / Hive                            │
+└────────────────┬────────────────────────────────┬───────────────┘
+                 │                                │
+                 ▼                                ▼
+┌────────────────────────────────┐ ┌──────────────────────────────┐
+│       UI / PRESENTATION        │ │      BACKGROUND SERVICES     │
+├────────────────────────────────┤ ├──────────────────────────────┤
+│ - Dashboard (Burn Rate)        │ │ - flutter_local_notifications│
+│ - Subscription List & Detail   │ │   (Triggers H-3 & H-1 Alerts)│
+│ - OCR Scanner & Manual Form    │ │                              │
+└────────────────────────────────┘ └──────────────────────────────┘
+
+3. Layer BreakdownA. Data Ingestion Layer (Input)Notification Listener Service (Android Native / Plugin):Mendengarkan notifikasi masuk dari aplikasi keuangan/e-wallet (GoPay, OVO, Bank).Meneruskan teks notifikasi ke Regex Parser.On-Device OCR Engine:Menggunakan google_mlkit_text_recognition.Memproses gambar kuitansi/struk digital dari galeri atau kamera secara lokal.B. Business Logic & Processing LayerRegex Parser Engine:Mengekstrak pola data spesifik dari teks notifikasi/OCR:Pattern: (?:RP|IDR|\$)\s?([\d.,]+) -> AmountPattern: (?:ke|at|paid to)\s+([A-Za-z0-9\s]+) -> Merchant/Service NameSubscription Scheduler & Logic Engine:Menghitung next_billing_date berdasarkan siklus (monthly, yearly, weekly).Menghitung total Monthly Burn Rate:$$\text{Total Monthly} = \sum \text{Monthly Costs} + \sum \left(\frac{\text{Yearly Costs}}{12}\right)$$C. Storage & State Management LayerLocal Database (SQLite / Hive):Menyimpan data langganan, riwayat transaksi, dan preferensi pengguna.State Management:Mengelola siklus hidup data (State) antara layar UI, pengingat notifikasi, dan database lokal.D. Presentation & Service LayerUser Interface (UI):Dashboard Screen: Menampilkan burn rate, statistik, dan daftar tagihan terdekat.Add/Edit Form: Input manual atau konfirmasi hasil konversi OCR/Notifikasi.Detail & Cancel Screen: Menampilkan rincian tagihan beserta tombol pintas deep link pembatalan.Local Notification Service:Menggunakan flutter_local_notifications untuk mendaftarkan jadwal pengingat (scheduled tasks) pada level sistem OS (H-3 dan H-1 sebelum tagihan).4. Database Schema (SQLite)SQL-- Table: subscriptions
+CREATE TABLE subscriptions (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    category TEXT DEFAULT 'General',
+    amount REAL NOT NULL,
+    currency TEXT DEFAULT 'IDR',
+    billing_cycle TEXT NOT NULL, -- 'weekly', 'monthly', 'yearly'
+    next_billing_date TEXT NOT NULL, -- ISO8601 String (YYYY-MM-DD)
+    is_trial INTEGER DEFAULT 0,  -- 0 = False, 1 = True
+    trial_end_date TEXT,
+    cancel_url TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: notification_logs (Audit trail for auto-detected alerts)
+CREATE TABLE notification_logs (
+    id TEXT PRIMARY KEY,
+    raw_text TEXT NOT NULL,
+    parsed_merchant TEXT,
+    parsed_amount REAL,
+    is_processed INTEGER DEFAULT 0,
+    received_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+5. Technology Stack & ConstraintsFramework: Flutter (Target: Android Platform)Language: DartArchitecture Pattern: Clean Architecture / Feature-First PatternCore Libraries:sqflite / hive (Local Storage)google_mlkit_text_recognition (OCR)flutter_local_notifications (Scheduled Alerts)url_launcher (Deep-link handling ke halaman pembatalan)Constraints: Tidak ada backend API, tidak ada otentikasi server, serverless, 100% data tersimpan di HP pengguna.
+***
+
+<ElicitationsGroup message="Bagaimana langkah selanjutnya yang ingin kamu lakukan di Claude?">
+  <Elicitation label="Buat prompt instruksi awal untuk Claude" query="Bisa bantu buatkan kalimat prompt pembuka yang tepat saat mengirimkan arsitektur ini ke Claude?"/>
+  <Elicitation label="Generate sampel kode Regex Parser untuk Flutter" query="Bisa bantu buatkan contoh kode Regex Parser Dart untuk membaca notifikasi bank lokal?"/>
+</ElicitationsGroup>
