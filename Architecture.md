@@ -4,9 +4,11 @@
 
 **SubCut** is a full-stack, local-first mobile and desktop-ready application designed to help users combat "Subscription Fatigue" and "Subscription Drift". The application provides passive financial protection by tracking recurring digital subscriptions, automatically detecting transactions via local device notification listeners and on-device OCR, and presenting clear expenditure summaries without requiring bank credential sharing or cloud-based server dependencies.
 
----
+│   ├── utils/                  # Format mata uang IDR & helper perhitungan tanggal
+│   └── widgets/                # Komponen UI umum yang dipakai lintas fitur
 
 ## 2. Tech Stack & Environment
+│   ├── auth/                   # Prototype akses lokal dan model pengguna
 
 * **Framework:** Flutter (Dart) (`apps/mobile` or root Flutter structure)
 * **Penyimpanan Lokal (Local Database):** SQLite / Hive (terenkripsi menggunakan SQLCipher)
@@ -70,14 +72,17 @@ lib/
 │   ├── constants/              # Pola Regex untuk parsing teks bank/e-wallet, konstanta warna
 │   ├── database/               # Konfigurasi lokal SQLite / Hive & enkripsi
 │   ├── services/               # Background Notification Listener, Local Notifications, & ML Kit OCR
-│   └── utils/                  # Format mata uang IDR & helper perhitungan tanggal
+│   ├── utils/                  # Format mata uang IDR & helper perhitungan tanggal
+│   └── widgets/                # Komponen UI umum yang dipakai lintas fitur
 │
 ├── features/
+│   ├── auth/                   # Prototype akses lokal dan model pengguna
 │   ├── dashboard/              # Ringkasan Burn Rate & kartu langganan terdekat
 │   ├── subscriptions/          # CRUD Manual & Detail Langganan
 │   ├── automation/             # Notification Listener & OCR Receipt Scanner Engine
 │   └── settings/               # Pengaturan pengingat lokal (H-3 / H-1) & preferensi
 │
+├── routes/                     # Definisi route dan navigasi antar screen
 ├── app.dart
 └── main.dart
 
