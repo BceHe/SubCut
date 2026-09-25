@@ -4,6 +4,8 @@ import 'features/auth/presentation/login_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/settings/presentation/profile_screen.dart';
 import 'features/subscriptions/presentation/detail_screen.dart';
+import 'features/subscriptions/presentation/subscription_form_screen.dart';
+import 'features/subscriptions/models/subscription.dart';
 import 'routes/app_routes.dart';
 
 class SubCutApp extends StatelessWidget {
@@ -19,11 +21,28 @@ class SubCutApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute: AppRoutes.login,
-      routes: {
-        AppRoutes.login: (_) => const LoginScreen(),
-        AppRoutes.dashboard: (_) => const DashboardScreen(),
-        AppRoutes.detail: (_) => const DetailScreen(),
-        AppRoutes.profile: (_) => const ProfileScreen(),
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case AppRoutes.login:
+            return MaterialPageRoute(builder: (_) => const LoginScreen());
+          case AppRoutes.dashboard:
+            return MaterialPageRoute(builder: (_) => const DashboardScreen());
+          case AppRoutes.profile:
+            return MaterialPageRoute(builder: (_) => const ProfileScreen());
+          case AppRoutes.detail:
+            final subscription = settings.arguments as Subscription;
+            return MaterialPageRoute(
+              builder: (_) => DetailScreen(subscription: subscription),
+            );
+          case AppRoutes.subscriptionForm:
+            return MaterialPageRoute(
+              builder: (_) => SubscriptionFormScreen(
+                subscription: settings.arguments as Subscription?,
+              ),
+            );
+          default:
+            return MaterialPageRoute(builder: (_) => const LoginScreen());
+        }
       },
     );
   }

@@ -1,0 +1,28 @@
+name: subcut
+description: Local-first subscription tracker and recurring expense manager.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_local_notifications: ^19.4.2
+  flutter_secure_storage: ^9.2.4
+  google_mlkit_text_recognition: ^0.15.0
+  image_picker: ^1.2.0
+  path: ^1.9.1
+  sqflite_sqlcipher: ^3.1.0+1
+  timezone: ^0.10.1
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
