@@ -190,7 +190,7 @@ Struktur kode menerapkan pendekatan *Feature-First* agar modular dan mudah diraw
 lib/
 ├── core/
 │   ├── constants/              # Pola Regex untuk parsing teks bank/e-wallet, konstanta warna
-│   ├── database/               # Konfigurasi lokal SQLite / Hive & enkripsi
+│   ├── database/               # Konfigurasi lokal SQLite terenkripsi
 │   ├── services/               # Background Notification Listener, Local Notifications, & ML Kit OCR
 │   ├── utils/                  # Format mata uang IDR & helper perhitungan tanggal
 │   └── widgets/                # Komponen UI umum yang dipakai lintas fitur
@@ -265,5 +265,5 @@ lib/
 
 * Kode sumber lengkap aplikasi Flutter.
 * Skema database lokal dan inisialisasi penyimpanan terenkripsi.
-* Konfigurasi *dependencies* pada `pubspec.yaml` (`flutter_local_notifications`, `google_mlkit_text_recognition`, sqflite/hive).
+* Konfigurasi *dependencies* pada `pubspec.yaml` (`sqflite`, SQLCipher-compatible driver, `flutter_secure_storage`, `flutter_local_notifications`, and `google_mlkit_text_recognition`).
 * `README.md` mencakup panduan instalasi, konfigurasi izin Android/iOS untuk *Notification Listener* dan *Camera/OCR*, serta cara menjalankan pengujian aplikasi.
