@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/services/local_notification_service.dart';
@@ -59,6 +61,10 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
   }
 
   Future<void> _save() async {
+    if (_isSaving) {
+      return;
+    }
+
     final name = _nameController.text.trim();
     final category = _categoryController.text.trim();
     final price = int.tryParse(_priceController.text.replaceAll('.', '').trim());
@@ -82,33 +88,55 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
       updatedAt: DateTime.now(),
       isActive: true,
     );
-    final savedId = widget.subscription?.id ?? await _repository.insert(subscription);
-    if (widget.subscription == null) {
-      await _scheduleReminders(savedId, subscription);
-    } else {
-      await _repository.update(subscription);
-      await _scheduleReminders(savedId, subscription);
-    }
-    if (mounted) {
+    try {
+      final savedId = widget.subscription == null
+          ? await _repository.insert(subscription)
+          : widget.subscription!.id!;
+
+      if (widget.subscription != null) {
+        await _repository.update(subscription);
+      }
+
+      if (!mounted) {
+        return;
+      }
+
       Navigator.pop(context, true);
+      unawaited(_scheduleReminders(savedId, subscription));
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menyimpan langganan: $error')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
   Future<void> _scheduleReminders(int id, Subscription subscription) async {
-    for (final daysBefore in [3, 1]) {
-      final dueDate = subscription.nextDueDate;
-      final scheduledAt = DateTime(
-        dueDate.year,
-        dueDate.month,
-        dueDate.day,
-        9,
-      ).subtract(Duration(days: daysBefore));
-      await LocalNotificationService.instance.scheduleReminder(
-        id: id * 10 + daysBefore,
-        title: 'Pengingat langganan',
-        body: '${subscription.name} jatuh tempo dalam $daysBefore hari.',
-        scheduledAt: scheduledAt,
-      );
+    try {
+      for (final daysBefore in [3, 1]) {
+        final dueDate = subscription.nextDueDate;
+        final scheduledAt = DateTime(
+          dueDate.year,
+          dueDate.month,
+          dueDate.day,
+          9,
+        ).subtract(Duration(days: daysBefore));
+        await LocalNotificationService.instance
+            .scheduleReminder(
+              id: id * 10 + daysBefore,
+              title: 'Pengingat langganan',
+              body: '${subscription.name} jatuh tempo dalam $daysBefore hari.',
+              scheduledAt: scheduledAt,
+            )
+            .timeout(const Duration(seconds: 5));
+      }
+    } catch (error) {
+      debugPrint('Pengingat langganan gagal dijadwalkan: $error');
     }
   }
 
