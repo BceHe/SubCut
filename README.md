@@ -82,3 +82,32 @@ Aplikasi dinyatakan berhasil memenuhi standar proyek jika:
 * **Penyimpanan Lokal:** SQLite / Hive
 * **OCR Engine:** Google ML Kit Text Recognition
 * **Testing & Emulator:** Android Studio (Android SDK)
+
+## Local Data & Persistence
+
+Subscription data is stored locally on Android and iOS in an encrypted SQLite database. The database key is stored using the platform's secure storage. No subscription data is sent to a backend.
+
+### Code locations
+
+* Data model and SQLite serialization: `lib/features/subscriptions/models/subscription.dart`
+* Database schema, SQLCipher setup, and key storage: `lib/core/database/local_database.dart`
+* Subscription CRUD operations: `lib/features/subscriptions/data/subscription_repository.dart`
+* Create and update form: `lib/features/subscriptions/presentation/subscription_form_screen.dart`
+* Read/list and delete flow: `lib/features/dashboard/presentation/dashboard_screen.dart` and `lib/features/subscriptions/presentation/detail_screen.dart`
+* Persistence integration test: `integration_test/subscription_persistence_test.dart`
+
+### Persistence demo
+
+1. Run the app on an Android emulator or device with `flutter run`.
+2. Add a subscription and confirm it appears on the dashboard.
+3. Stop and relaunch the app with `flutter run`; confirm the subscription is still listed.
+4. Edit the subscription, stop and relaunch the app, then confirm the updated value remains.
+5. Delete it and confirm it no longer appears in the active dashboard list.
+
+Run the native persistence test on a connected Android or iOS device:
+
+```powershell
+flutter test integration_test/subscription_persistence_test.dart -d <device-id>
+```
+
+The test creates a record, closes the database connection, reopens it, verifies the saved values, then checks update and delete behavior.
