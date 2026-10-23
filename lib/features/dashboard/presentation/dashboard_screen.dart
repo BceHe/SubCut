@@ -5,6 +5,7 @@ import '../../../routes/app_routes.dart';
 import '../../subscriptions/data/subscription_repository.dart';
 import '../../subscriptions/models/subscription.dart';
 import '../../subscriptions/widgets/subscription_card.dart';
+import '../../subscriptions/domain/subscription_business_rules.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -61,10 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Center(child: Text('Gagal memuat data: ${snapshot.error}'));
           }
           final subscriptions = snapshot.data ?? const <Subscription>[];
-          final monthlyBurnRate = subscriptions.fold<double>(
-            0,
-            (total, item) => total + item.monthlyCost,
-          ).round();
+          final monthlyBurnRate = SubscriptionBusinessRules.monthlyBurnRate(subscriptions);
           return RefreshIndicator(
             onRefresh: () async => setState(_reload),
             child: ListView(

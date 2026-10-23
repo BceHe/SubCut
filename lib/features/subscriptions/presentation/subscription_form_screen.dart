@@ -8,6 +8,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../data/subscription_repository.dart';
 import '../models/subscription.dart';
+import '../domain/subscription_business_rules.dart';
 
 class SubscriptionFormScreen extends StatefulWidget {
   const SubscriptionFormScreen({this.subscription, super.key});
@@ -67,13 +68,18 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
 
     final name = _nameController.text.trim();
     final category = _categoryController.text.trim();
-    final price = int.tryParse(_priceController.text.replaceAll('.', '').trim());
-    if (name.isEmpty || category.isEmpty || price == null || price < 0) {
+    final validation = SubscriptionBusinessRules.validateInput(
+      name: name,
+      category: category,
+      priceText: _priceController.text,
+    );
+    if (!validation.isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lengkapi nama, kategori, dan biaya dengan benar.')),
+        SnackBar(content: Text(validation.error!)),
       );
       return;
     }
+    final price = SubscriptionBusinessRules.parsePrice(_priceController.text);
 
     setState(() => _isSaving = true);
     final subscription = Subscription(
@@ -118,14 +124,10 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
 
   Future<void> _scheduleReminders(int id, Subscription subscription) async {
     try {
-      for (final daysBefore in [3, 1]) {
-        final dueDate = subscription.nextDueDate;
-        final scheduledAt = DateTime(
-          dueDate.year,
-          dueDate.month,
-          dueDate.day,
-          9,
-        ).subtract(Duration(days: daysBefore));
+      final dates = SubscriptionBusinessRules.reminderDates(subscription.nextDueDate);
+      for (var index = 0; index < dates.length; index++) {
+        final daysBefore = [3, 1][index];
+        final scheduledAt = dates[index];
         await LocalNotificationService.instance
             .scheduleReminder(
               id: id * 10 + daysBefore,
@@ -191,7 +193,7 @@ class _SubscriptionFormScreenState extends State<SubscriptionFormScreen> {
   }
 
   int get pricePreview {
-    final price = int.tryParse(_priceController.text.replaceAll('.', '').trim()) ?? 0;
+    final price = SubscriptionBusinessRules.parsePrice(_priceController.text);
     return _billingCycle == BillingCycle.yearly ? (price / 12).round() : price;
   }
 }
