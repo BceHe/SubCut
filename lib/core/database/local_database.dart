@@ -7,7 +7,7 @@ class LocalDatabase {
 
   static final instance = LocalDatabase._();
   static const _databaseName = 'subcut.db';
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
   static const _databaseKeyName = 'subcut_database_key';
   static const _secureStorage = FlutterSecureStorage();
 
@@ -27,7 +27,46 @@ class LocalDatabase {
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
       },
+      onUpgrade: (database, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await database.execute('''
+            CREATE TABLE users (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT NOT NULL,
+              email TEXT NOT NULL UNIQUE,
+              password TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            )
+          ''');
+          final now = DateTime.now().toUtc().toIso8601String();
+          await database.insert('users', {
+            'name': 'Pengguna SubCut',
+            'email': 'pengguna@subcut.local',
+            'password': 'demo1234',
+            'created_at': now,
+          });
+          await database.execute(
+              'ALTER TABLE subscriptions ADD COLUMN user_id INTEGER NOT NULL DEFAULT 1');
+          await database.execute(
+              'CREATE INDEX idx_subscriptions_user_active ON subscriptions(user_id, is_active)');
+        }
+      },
       onCreate: (database, version) async {
+        await database.execute('''
+          CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            created_at TEXT NOT NULL
+          )
+        ''');
+        await database.insert('users', {
+          'name': 'Pengguna SubCut',
+          'email': 'pengguna@subcut.local',
+          'password': '',
+          'created_at': DateTime.now().toUtc().toIso8601String(),
+        });
         await database.execute('''
           CREATE TABLE subscriptions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +80,9 @@ class LocalDatabase {
             merchant_key TEXT,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
-            is_active INTEGER NOT NULL DEFAULT 1
+            is_active INTEGER NOT NULL DEFAULT 1,
+            user_id INTEGER NOT NULL DEFAULT 1,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
           )
         ''');
         await database.execute('''
@@ -75,6 +116,9 @@ class LocalDatabase {
         await database.execute(
           'CREATE INDEX idx_subscriptions_merchant_key ON subscriptions(merchant_key)',
         );
+        await database.execute(
+          'CREATE INDEX idx_subscriptions_user_active ON subscriptions(user_id, is_active)',
+        );
       },
     );
     return _database!;
@@ -86,7 +130,8 @@ class LocalDatabase {
       return existingKey;
     }
 
-    final key = '${DateTime.now().microsecondsSinceEpoch}-${DateTime.now().millisecondsSinceEpoch}';
+    final key =
+        '${DateTime.now().microsecondsSinceEpoch}-${DateTime.now().millisecondsSinceEpoch}';
     await _secureStorage.write(key: _databaseKeyName, value: key);
     return key;
   }

@@ -10,10 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:subcut/app.dart';
 
 void main() {
-  testWidgets('renders the SubCut login screen', (WidgetTester tester) async {
+  testWidgets('opens the dashboard without login', (WidgetTester tester) async {
     await tester.pumpWidget(const SubCutApp());
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('Selamat datang di SubCut'), findsOneWidget);
-    expect(find.text('Masuk'), findsOneWidget);
+    expect(find.text('Ringkasan'), findsOneWidget);
   });
 }

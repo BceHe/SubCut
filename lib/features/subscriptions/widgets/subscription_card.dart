@@ -16,14 +16,22 @@ class SubscriptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         onTap: onTap,
-        leading: const CircleAvatar(child: Icon(Icons.subscriptions_outlined)),
-        title: Text(subscription.name),
-        subtitle: Text(
-          'Jatuh tempo ${subscription.nextDueDate.day}/${subscription.nextDueDate.month}/${subscription.nextDueDate.year}',
+        leading: CircleAvatar(
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          child: Icon(Icons.subscriptions_outlined,
+              color: Theme.of(context).colorScheme.primary),
         ),
-        trailing: Text(formatIdr(subscription.price)),
+        title: Text(subscription.name,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
+        subtitle: Text(
+          '${subscription.category} • Jatuh tempo ${subscription.nextDueDate.day}/${subscription.nextDueDate.month}/${subscription.nextDueDate.year}',
+        ),
+        trailing: Text(formatIdr(subscription.price),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }

@@ -43,7 +43,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        automaticallyImplyLeading: false,
+        title: const Text('Ringkasan'),
         actions: [
           IconButton(
             tooltip: 'Profil',
@@ -62,25 +63,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Center(child: Text('Gagal memuat data: ${snapshot.error}'));
           }
           final subscriptions = snapshot.data ?? const <Subscription>[];
-          final monthlyBurnRate = SubscriptionBusinessRules.monthlyBurnRate(subscriptions);
+          final monthlyBurnRate =
+              SubscriptionBusinessRules.monthlyBurnRate(subscriptions);
           return RefreshIndicator(
             onRefresh: () async => setState(_reload),
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
               children: [
-                Text('Ringkasan pengeluaran', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 12),
+                Text('Halo, selamat datang kembali',
+                    style: Theme.of(context).textTheme.bodyLarge),
+                const SizedBox(height: 4),
+                Text('Pantau biaya berulangmu dengan tenang.',
+                    style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 20),
                 Card(
+                  color: Theme.of(context).colorScheme.primary,
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Burn rate bulanan'),
+                        Text('Burn rate bulanan',
+                            style: TextStyle(
+                                color: Colors.white.withValues(alpha: .8))),
                         const SizedBox(height: 8),
-                        Text(formatIdr(monthlyBurnRate), style: Theme.of(context).textTheme.headlineMedium),
+                        Text(formatIdr(monthlyBurnRate),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700)),
                         const SizedBox(height: 4),
-                        Text('${formatIdr(monthlyBurnRate * 12)} estimasi tahunan'),
+                        Text(
+                            '${formatIdr(monthlyBurnRate * 12)} estimasi tahunan',
+                            style: TextStyle(
+                                color: Colors.white.withValues(alpha: .8))),
                       ],
                     ),
                   ),
@@ -89,8 +107,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Langganan terdekat', style: Theme.of(context).textTheme.titleLarge),
-                    Text('${subscriptions.length} aktif'),
+                    Text('Langganan aktif',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    Text('${subscriptions.length} layanan',
+                        style: Theme.of(context).textTheme.bodyMedium),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -98,7 +121,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const Card(
                     child: Padding(
                       padding: EdgeInsets.all(20),
-                      child: Text('Belum ada langganan. Tambahkan data pertama Anda.'),
+                      child: Text(
+                          'Belum ada langganan. Tambahkan data pertama Anda.'),
                     ),
                   ),
                 ...subscriptions.map(

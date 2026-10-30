@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../routes/app_routes.dart';
-
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -12,9 +10,12 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const CircleAvatar(radius: 36, child: Icon(Icons.person_outline, size: 36)),
+          const CircleAvatar(
+              radius: 36, child: Icon(Icons.person_outline, size: 36)),
           const SizedBox(height: 12),
-          Text('Pengguna SubCut', style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+          Text('Pengguna SubCut',
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.center),
           const SizedBox(height: 4),
           const Text('pengguna@subcut.local', textAlign: TextAlign.center),
           const SizedBox(height: 24),
@@ -30,9 +31,9 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+            onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.logout),
-            label: const Text('Keluar'),
+            label: const Text('Tutup halaman profil'),
           ),
         ],
       ),
