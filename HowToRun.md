@@ -72,3 +72,12 @@ OCR, dan notifikasi harus didemonstrasikan pada Android/iOS, bukan web.
 8. Uji OCR invoice dan parser notifikasi, konfirmasi hasil ekstraksi, lalu simpan.
 9. Buka detail dan gunakan shortcut pembatalan.
 10. Tutup dan jalankan ulang aplikasi untuk memverifikasi persistence.
+
+### Uji kamera dan OCR
+
+1. Buka form **Tambah langganan**.
+2. Pilih **Scan invoice dengan kamera**.
+3. Pilih **Ambil foto invoice** atau **Pilih dari galeri**.
+4. Izinkan akses kamera jika Android memintanya.
+5. Jika dibatalkan, form tetap aman dan dapat diisi manual.
+6. Setelah OCR selesai, periksa nama, nominal, dan tanggal yang terdeteksi sebelum menyimpan.

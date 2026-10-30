@@ -15,7 +15,8 @@ manual yang terdokumentasi.
 | Isolasi data antar akun | PASSED | filter `user_id` pada `SubscriptionRepository` |
 | Pengingat H-3/H-1 pukul 09.00 | PASSED | `subscription_reminder_test.dart` |
 | Loading, empty state, dan error state | PASSED | dashboard/form flow inspection |
-| OCR invoice terintegrasi ke alur simpan | TODO | perlu implementasi dan uji perangkat |
+| OCR invoice terintegrasi ke alur simpan | PASSED | tombol scan, parsing kandidat, dan form review |
+| Kamera/galeri serta pembatalan scan | PASSED | `image_picker` dengan camera/gallery dan null cancellation handling |
 | Parser notification listener simulasi | TODO | perlu implementasi dan uji parser |
 | Shortcut pembatalan langganan | TODO | perlu implementasi dan uji deep link |
 | Video demo alur lengkap | TODO | rekam setelah fitur final pada emulator/perangkat |
