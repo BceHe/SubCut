@@ -65,12 +65,14 @@ OCR, dan notifikasi harus didemonstrasikan pada Android/iOS, bukan web.
 1. Pada penggunaan pertama, masukkan nama untuk ditampilkan di halaman profil.
 2. Nama disimpan secara lokal; setelah itu aplikasi langsung membuka dashboard.
 3. Buka profil untuk memverifikasi nama yang tersimpan.
-4. Tambahkan langganan manual dan verifikasi kartu serta ringkasan burn rate.
-5. Edit langganan, kembali ke dashboard, lalu verifikasi nilai terbaru.
-6. Buka detail dan hapus langganan setelah konfirmasi.
-7. Uji OCR invoice dan parser notifikasi, konfirmasi hasil ekstraksi, lalu simpan.
-8. Buka detail dan gunakan shortcut pembatalan.
-9. Tutup dan jalankan ulang aplikasi untuk memverifikasi nama dan data langganan tetap tersimpan.
+4. Dari profil, tetapkan anggaran bulanan dan simpan.
+5. Kembali ke dashboard dan verifikasi perbandingan burn rate dengan anggaran.
+6. Tambahkan langganan manual dan verifikasi kartu serta ringkasan burn rate.
+7. Edit langganan, kembali ke dashboard, lalu verifikasi nilai terbaru.
+8. Buka detail dan hapus langganan setelah konfirmasi.
+9. Uji OCR invoice dan parser notifikasi, konfirmasi hasil ekstraksi, lalu simpan.
+10. Buka detail dan gunakan shortcut pembatalan.
+11. Tutup dan jalankan ulang aplikasi untuk memverifikasi nama, anggaran, dan data langganan tetap tersimpan.
 
 ### Uji kamera dan OCR
 

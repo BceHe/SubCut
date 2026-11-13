@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/settings/data/budget_repository.dart';
 import 'features/settings/data/profile_repository.dart';
 import 'features/settings/presentation/profile_entry_gate.dart';
 import 'features/settings/presentation/profile_screen.dart';
@@ -10,13 +11,19 @@ import 'features/subscriptions/models/subscription.dart';
 import 'routes/app_routes.dart';
 
 class SubCutApp extends StatelessWidget {
-  const SubCutApp({this.profileRepository, super.key});
+  const SubCutApp({
+    this.profileRepository,
+    this.budgetRepository,
+    super.key,
+  });
 
   final ProfileRepository? profileRepository;
+  final BudgetRepository? budgetRepository;
 
   @override
   Widget build(BuildContext context) {
     final repository = profileRepository ?? ProfileRepository();
+    final budget = budgetRepository ?? BudgetRepository();
     return MaterialApp(
       title: 'SubCut',
       debugShowCheckedModeBanner: false,
@@ -69,14 +76,22 @@ class SubCutApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: ProfileEntryGate(repository: repository),
+      home: ProfileEntryGate(
+        repository: repository,
+        budgetRepository: budget,
+      ),
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case AppRoutes.dashboard:
-            return MaterialPageRoute(builder: (_) => const DashboardScreen());
+            return MaterialPageRoute(
+              builder: (_) => DashboardScreen(budgetRepository: budget),
+            );
           case AppRoutes.profile:
             return MaterialPageRoute(
-              builder: (_) => ProfileScreen(repository: repository),
+              builder: (_) => ProfileScreen(
+                repository: repository,
+                budgetRepository: budget,
+              ),
             );
           case AppRoutes.detail:
             final subscription = settings.arguments as Subscription;

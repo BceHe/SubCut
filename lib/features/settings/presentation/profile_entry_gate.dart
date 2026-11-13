@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../data/budget_repository.dart';
 import '../data/profile_repository.dart';
 import 'profile_form.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
 
 class ProfileEntryGate extends StatefulWidget {
-  const ProfileEntryGate({required this.repository, super.key});
+  const ProfileEntryGate({
+    required this.repository,
+    required this.budgetRepository,
+    super.key,
+  });
 
   final ProfileRepository repository;
+  final BudgetRepository budgetRepository;
 
   @override
   State<ProfileEntryGate> createState() => _ProfileEntryGateState();
@@ -36,7 +42,7 @@ class _ProfileEntryGateState extends State<ProfileEntryGate> {
   @override
   Widget build(BuildContext context) {
     if (_savedName != null) {
-      return const DashboardScreen();
+      return DashboardScreen(budgetRepository: widget.budgetRepository);
     }
 
     return FutureBuilder<String?>(
@@ -66,7 +72,7 @@ class _ProfileEntryGateState extends State<ProfileEntryGate> {
         }
         final name = snapshot.data;
         if (name != null && name.trim().isNotEmpty) {
-          return const DashboardScreen();
+          return DashboardScreen(budgetRepository: widget.budgetRepository);
         }
         return ProfileForm(
           repository: widget.repository,

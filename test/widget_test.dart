@@ -9,13 +9,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:subcut/app.dart';
+import 'package:subcut/features/settings/data/budget_repository.dart';
 import 'package:subcut/features/settings/data/profile_repository.dart';
 
 void main() {
   testWidgets('asks for a name before opening the dashboard',
       (WidgetTester tester) async {
     final repository = _MemoryProfileRepository();
-    await tester.pumpWidget(SubCutApp(profileRepository: repository));
+    await tester.pumpWidget(
+      SubCutApp(
+        profileRepository: repository,
+        budgetRepository: _MemoryBudgetRepository(),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Siapa nama Anda?'), findsOneWidget);
@@ -31,7 +37,12 @@ void main() {
   testWidgets('skips the name form when a name is already saved',
       (WidgetTester tester) async {
     final repository = _MemoryProfileRepository()..name = 'Budi';
-    await tester.pumpWidget(SubCutApp(profileRepository: repository));
+    await tester.pumpWidget(
+      SubCutApp(
+        profileRepository: repository,
+        budgetRepository: _MemoryBudgetRepository(),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
@@ -47,7 +58,10 @@ void main() {
   testWidgets('shows validation when the name is blank',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      SubCutApp(profileRepository: _MemoryProfileRepository()),
+      SubCutApp(
+        profileRepository: _MemoryProfileRepository(),
+        budgetRepository: _MemoryBudgetRepository(),
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Mulai menggunakan SubCut'));
@@ -67,5 +81,22 @@ class _MemoryProfileRepository extends ProfileRepository {
   @override
   Future<void> saveName(String name) async {
     this.name = name;
+  }
+}
+
+class _MemoryBudgetRepository extends BudgetRepository {
+  int? budget;
+
+  @override
+  Future<int?> getMonthlyBudget() async => budget;
+
+  @override
+  Future<void> saveMonthlyBudget(int amount) async {
+    budget = amount;
+  }
+
+  @override
+  Future<void> clearMonthlyBudget() async {
+    budget = null;
   }
 }

@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../data/budget_repository.dart';
 import '../data/profile_repository.dart';
+import 'monthly_budget_settings.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({required this.repository, super.key});
+  const ProfileScreen({
+    required this.repository,
+    required this.budgetRepository,
+    super.key,
+  });
 
   final ProfileRepository repository;
+  final BudgetRepository budgetRepository;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -62,6 +69,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 24),
+              Text(
+                'Anggaran',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              MonthlyBudgetSettings(repository: widget.budgetRepository),
               const SizedBox(height: 24),
               const ListTile(
                 leading: Icon(Icons.notifications_outlined),
