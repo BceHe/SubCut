@@ -62,16 +62,15 @@ OCR, dan notifikasi harus didemonstrasikan pada Android/iOS, bukan web.
 
 ## Alur demo
 
-1. Aplikasi dibuka langsung ke dashboard tanpa login.
-2. Untuk membuat atau mengganti akun, buka halaman akun dari menu profil.
-3. Isi nama, email, dan kata sandi minimal 4 karakter, lalu pilih **Buat akun**.
-4. Setiap akun memiliki ruang data subscription sendiri.
-5. Tambahkan langganan manual dan verifikasi kartu serta ringkasan burn rate.
-6. Edit langganan, kembali ke dashboard, lalu verifikasi nilai terbaru.
-7. Buka detail dan hapus langganan setelah konfirmasi.
-8. Uji OCR invoice dan parser notifikasi, konfirmasi hasil ekstraksi, lalu simpan.
-9. Buka detail dan gunakan shortcut pembatalan.
-10. Tutup dan jalankan ulang aplikasi untuk memverifikasi persistence.
+1. Pada penggunaan pertama, masukkan nama untuk ditampilkan di halaman profil.
+2. Nama disimpan secara lokal; setelah itu aplikasi langsung membuka dashboard.
+3. Buka profil untuk memverifikasi nama yang tersimpan.
+4. Tambahkan langganan manual dan verifikasi kartu serta ringkasan burn rate.
+5. Edit langganan, kembali ke dashboard, lalu verifikasi nilai terbaru.
+6. Buka detail dan hapus langganan setelah konfirmasi.
+7. Uji OCR invoice dan parser notifikasi, konfirmasi hasil ekstraksi, lalu simpan.
+8. Buka detail dan gunakan shortcut pembatalan.
+9. Tutup dan jalankan ulang aplikasi untuk memverifikasi nama dan data langganan tetap tersimpan.
 
 ### Uji kamera dan OCR
 

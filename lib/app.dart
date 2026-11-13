@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/settings/data/profile_repository.dart';
+import 'features/settings/presentation/profile_entry_gate.dart';
 import 'features/settings/presentation/profile_screen.dart';
 import 'features/subscriptions/presentation/detail_screen.dart';
 import 'features/subscriptions/presentation/subscription_form_screen.dart';
@@ -8,10 +10,13 @@ import 'features/subscriptions/models/subscription.dart';
 import 'routes/app_routes.dart';
 
 class SubCutApp extends StatelessWidget {
-  const SubCutApp({super.key});
+  const SubCutApp({this.profileRepository, super.key});
+
+  final ProfileRepository? profileRepository;
 
   @override
   Widget build(BuildContext context) {
+    final repository = profileRepository ?? ProfileRepository();
     return MaterialApp(
       title: 'SubCut',
       debugShowCheckedModeBanner: false,
@@ -64,14 +69,15 @@ class SubCutApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      // Local-first app: open directly to the active user's dashboard.
-      initialRoute: AppRoutes.dashboard,
+      home: ProfileEntryGate(repository: repository),
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case AppRoutes.dashboard:
             return MaterialPageRoute(builder: (_) => const DashboardScreen());
           case AppRoutes.profile:
-            return MaterialPageRoute(builder: (_) => const ProfileScreen());
+            return MaterialPageRoute(
+              builder: (_) => ProfileScreen(repository: repository),
+            );
           case AppRoutes.detail:
             final subscription = settings.arguments as Subscription;
             return MaterialPageRoute(
